@@ -5,6 +5,7 @@ public class SingletonExample : ServiceBase<SingletonExample>
 {
     public void DebugMyLog()
     {
-        ServiceManager.GetService<SingletonExample2>().DebugMyLog();
+        var x = ServiceManager.GetService<SingletonExample2>();
+        x.DebugMyLog();
     }
 }

@@ -8,7 +8,7 @@ namespace JadesToolkit
 {
     public static class ServiceManager
     {
-        private static Dictionary<System.Type, ServiceBase> services = new Dictionary<Type, ServiceBase>();
+        private static Dictionary<Type, ServiceBase> services = new Dictionary<Type, ServiceBase>();
 
         private static GameObject coreObject;
 
@@ -79,6 +79,11 @@ namespace JadesToolkit
             GameObject.Destroy(service);
         }
 
+        /// <summary>
+        /// Attempts to start a service specified by type T
+        /// </summary>
+        /// <typeparam name="T">The type of the service</typeparam>
+        /// <returns>Returns true is service was successfully started, false otherwise.</returns>
         public static bool StartService<T>() where T : ServiceBase
         {
             if (services.ContainsKey(typeof(T)))

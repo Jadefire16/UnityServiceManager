@@ -14,7 +14,7 @@ namespace JadesToolkit
             if (instance == null)
             {
                 instance = gameObject.AddComponent<T>();
-                throw new InvalidStateException($"Specified Instance was null! This likely means the {nameof(ServiceManager)} failed to register this component!");
+                throw new InvalidStateException($"This service is currently not running! You need to start the service using ServiceManager.StartService<{typeof(T).Name}>() before using this service.");
             }
             Initialized = true;
         }
