@@ -1,10 +1,10 @@
 ﻿using JadesToolkit;
 using UnityEngine;
 
-public class SingletonExample : SingletonBase<SingletonExample>
+public class SingletonExample : ServiceBase<SingletonExample>
 {
     public void DebugMyLog()
     {
-        Debug.Log(Instance.GetType());
+        ServiceManager.GetService<SingletonExample2>().DebugMyLog();
     }
 }

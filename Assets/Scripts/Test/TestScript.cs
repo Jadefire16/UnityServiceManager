@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using JadesToolkit;
+using UnityEngine;
 
 public class TestScript : MonoBehaviour
 {
@@ -6,8 +7,7 @@ public class TestScript : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            SingletonExample.Instance.DebugMyLog();
-            SingletonExample2.Instance.DebugMyLog();
+            ServiceManager.GetService<SingletonExample>().DebugMyLog();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 namespace JadesToolkit
 {
-    public abstract class MonoSingleton : MonoBehaviour
+    public abstract class ServiceBase : MonoBehaviour
     {
         public abstract void Initialize();
     }
