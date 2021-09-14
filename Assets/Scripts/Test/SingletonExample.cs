@@ -1,6 +1,7 @@
 ﻿using JadesToolkit;
 using UnityEngine;
 
+[DoNotInitializOnLoad]
 public class SingletonExample : ServiceBase<SingletonExample>
 {
     public void DebugMyLog()

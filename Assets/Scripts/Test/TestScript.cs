@@ -1,4 +1,5 @@
 ﻿using JadesToolkit;
+using System.Collections;
 using UnityEngine;
 
 public class TestScript : MonoBehaviour
@@ -7,7 +8,18 @@ public class TestScript : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Return))
         {
-            ServiceManager.GetService<SingletonExample>().DebugMyLog();
+            ServiceManager.StartService<SingletonExample>();
         }
     }
+
+    private IEnumerator Timer(float t)
+    {
+        WaitForSeconds waitFor = new WaitForSeconds(t);
+        ServiceManager.EndService<SingletonExample>();
+        yield return waitFor;
+        ServiceManager.StartService<SingletonExample2>();
+        yield return waitFor;
+        ServiceManager.ForceStartService<SingletonExample2>();
+    }
+
 }
