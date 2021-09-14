@@ -11,7 +11,7 @@ The Unity Service Manager is a simple tool built for Unity. It creates a robust 
 - Instead of inheriting from Monobehaviour, inherit from ServiceBase<T> where T is the current class
 
 A quick example would be something like this
-```c
+```cs
 public class GameManager : ServiceBase<GameManager>
 {
     //Really thats it!
@@ -25,7 +25,7 @@ Well through a litte bit of reflection magic the SceneManager class packed into 
 ##### What Do I Do After That?
 #
 Next you have to actually get references to those services in your code, say you had a script which needed to access your scene manager to let it know something happened, here's how you could go about doing it.
-```c
+```cs
 public class MyTriggerClass : MonoBehaviour
 {
     public void OnTriggerEnter(Collider other){
@@ -35,7 +35,7 @@ public class MyTriggerClass : MonoBehaviour
 ```
 
 Pretty neat huh? We've now called the TriggerCollided function in our SceneManager and our SceneManager is well on it's way to doing what it needs to do next, but what if we needed to call a function lots? Like on a score manager? Getting that component over and over would be pretty silly so let's try something else...
-```c
+```cs
 public class ScoreCounter : ServiceBase<ScoreCounter>
 {
     private int currentScore;
@@ -54,7 +54,7 @@ public class ScoreCounter : ServiceBase<ScoreCounter>
 Here we actually have two services running together at the same time, and our ScoreCounter manager is referencing our UIManager to let it know when our score updates! But how? Well we store a reference to the UIManager in our ScoreCounter class and assign it to the value we return when we call GetService()!
 
 Last we have the...
-```c
+```cs
 [DoNotInitializeOnLoad]
 ```
 ... Attribute which when placed above any class, that inherits ServiceBase, will let the ServiceManager know not to initialize this service! this can be useful if you want to do the setup yourself or need to have a different way of managing things but still want to use the ServiceManager!
