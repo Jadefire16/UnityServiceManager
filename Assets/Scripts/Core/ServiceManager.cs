@@ -23,7 +23,7 @@ namespace JadesToolkit
 
             foreach (var service in allServiceTypes)
             {
-                if (service.IsDefined(typeof(DoNotInitializOnLoadAttribute), false))
+                if (service.IsDefined(typeof(DoNotInitializeOnLoadAttribute), false))
                     continue;
                 var component = coreObject.AddComponent(service) as ServiceBase;
                 component.Initialize();

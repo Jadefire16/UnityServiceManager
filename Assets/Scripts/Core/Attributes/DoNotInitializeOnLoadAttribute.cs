@@ -4,5 +4,5 @@ using UnityEngine;
 namespace JadesToolkit
 {
     [System.AttributeUsage(System.AttributeTargets.Class)]
-    public class DoNotInitializOnLoadAttribute : System.Attribute { }
+    public class DoNotInitializeOnLoadAttribute : System.Attribute { }
 }
