@@ -9,11 +9,13 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Mm]emoryCaptures/
-/[Tt]est/
-/[Tt]ests/
+
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
 
+**/[Tt]est/**/*
+**/[Tt]ests/**/*
+/[Aa]ssets/[Tt]est.meta
 # Uncomment this line if you wish to ignore the asset store tools plugin
 # /[Aa]ssets/AssetStoreTools*
 

@@ -14,10 +14,9 @@ namespace JadesToolkit
             if (instance == null)
             {
                 instance = gameObject.AddComponent<T>();
-                throw new InvalidStateException($"This service is currently not running! You need to start the service using ServiceManager.StartService<{typeof(T).Name}>() before using this service.");
+                throw new InvalidStateException($"This service is currently not running! You need to start the service using ServiceManager. StartService<{typeof(T).Name}>() before using this service.");
             }
             Initialized = true;
         }
-
     }
 }
