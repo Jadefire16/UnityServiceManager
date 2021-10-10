@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JadesToolkit
+namespace JadesToolkit.Services.Exceptions
 {
     [Serializable]
     public class InvalidStateException : Exception
@@ -8,6 +8,5 @@ namespace JadesToolkit
         public InvalidStateException() { }
         public InvalidStateException(string message) : base(message) { }
         public InvalidStateException(string message, Exception inner) : base(message, inner) { }
-
     }
 }

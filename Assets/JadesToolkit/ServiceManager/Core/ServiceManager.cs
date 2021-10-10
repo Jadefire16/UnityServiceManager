@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using JadesToolkit.Services.Attributes;
+using UnityEngine;
+using System;
 using System.Linq;
 using System.Reflection;
-using UnityEngine;
+using System.Collections.Generic;
 
-namespace JadesToolkit
+namespace JadesToolkit.Services
 {
     public static class ServiceManager
     {
@@ -52,10 +53,16 @@ namespace JadesToolkit
         /// This will attempt to immediately fetch a loaded singleton of type T.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns>T where T is a MonoSingleton.</returns>
+        /// <returns name="T"><typeparamref name="T"/> where <typeparamref name="T"/> is type of <typeparamref name="ServiceBase"/>.</returns>
         public static T GetService<T>() where T : ServiceBase => services[typeof(T)] as T;
 
-        public static T GetOrStartService<T>() where T : ServiceBase
+        /// <summary>
+        /// This will immediately fetch a loaded singleton of type T.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <remarks>If a service is not already active of type T one will be started</remarks>
+        /// <returns name="T"><typeparamref name="T"/> where <typeparamref name="T"/> is type of <typeparamref name="ServiceBase"/>.</returns>
+        public static T GetRequiredService<T>() where T : ServiceBase
         {
             if (TryGetService<T>(out T value))
                 return value;
@@ -78,7 +85,7 @@ namespace JadesToolkit
         }
 
         /// <summary>
-        /// Attempts to end the service of type T
+        /// Attempts to end the service of type T and destroys the object
         /// </summary>
         /// <typeparam name="T">Type of Service</typeparam>
         public static void EndService<T>() where T : ServiceBase
@@ -86,6 +93,28 @@ namespace JadesToolkit
             var service = services[typeof(T)];
             services.Remove(typeof(T));
             GameObject.Destroy(service);
+        }
+
+        /// <summary>
+        /// Removes the service from the service managers control.
+        /// </summary>
+        /// <typeparam name="T">Type of Service</typeparam>
+        public static void TryRemoveService<T>() where T : ServiceBase
+        {
+            if (!services.ContainsKey(typeof(T)))
+                return;
+            services.Remove(typeof(T));
+        }
+
+        /// <summary>
+        /// Removes the service from the service managers control.
+        /// </summary>
+        /// <typeparam name="T">Type of Service</typeparam>
+        public static void TryRemoveService(Type t)
+        {
+            if (!services.ContainsKey(t))
+                return;
+            services.Remove(t);
         }
 
         /// <summary>
@@ -118,6 +147,22 @@ namespace JadesToolkit
             component.Initialize();
             services.Add(typeof(T), component);
             return component as T;
+        }
+
+        /// <summary>
+        /// Integrates an external service into the service manager.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>T where T is ServiceBase</returns>
+        /// <remarks>This is useful for services marked with <typeparamref name="DoNotInitializeOnLoad"/></remarks>
+        public static bool TryAddExternalService<T>(ServiceBase<T> service, bool initialize = false) where T : ServiceBase
+        {
+            if (services.ContainsKey(typeof(T)))
+                return false;
+            services.Add(typeof(T), service);
+            if (initialize)
+                service.Initialize();
+            return true;
         }
     }
 }
