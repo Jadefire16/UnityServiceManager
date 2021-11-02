@@ -62,3 +62,60 @@ Last we have the...
 There's a few other features you can play around with, feel free to take a look at whats there to offer!
 
 
+## Update 2021.11
+
+#### New features have been intorduced!
+
+Taking a look at the ServiceManager of version 2021.10 to 2020.11 things may look a little unfamiliar and maybe even a bit confusing. But don't worry, we have a quick start guide right here! First let's talk about the changes...
+
+##### IServiceBehaviour
+
+That's right! Our very first interface in the ServiceManager, and it brings a ton of new changes to the whole workflow from ease of use, to even better performance!
+
+Before you dive right in there's a few things to note...
+- Any class which implements should also inherit directly or indirectly from MonoBehaviour
+- You should use the generic version if you can! The system is designed to work without it however
+- You'll need to ensure that services which are destroyed or disabled outside of the ServiceManager are properly removed! (I recommend the use of OnDestroy or OnDisable for this)
+
+##### Let's Take a Dive Into a Quick Example
+
+```cs
+using JadesToolkit.Services;
+using JadesToolkit.Services.Interfaces;
+using UnityEngine;
+
+public class GameManager : MonoBehaviour, IServiceBehavour<GameManager>
+{
+    private static GameManager instance;
+
+    public void Initialize()
+    {
+        if (instance != null)
+        {
+            Destroy(this);
+            return;
+        }
+        instance = this;
+    }
+    public bool TryGetService(out GameManager service)
+    {
+        service = instance;
+        return service == null;
+    }
+    public bool TryGetService(out object obj)
+    {
+        obj = instance;
+        return obj == null;
+    }
+    protected void OnDestroy()
+    {
+        ServiceManager.TryRemoveService(GetType());
+        instance = null;
+    }
+}
+```
+In this example we create a GameManager which is fully managed by the ServiceManager however isn't restricted to the old way of handling things, namely, the ServiceBase<T> class.
+
+###### What are the advantages of this approach?
+For starters this allows much more flexibility in projects, easily making it possible to integrate the framework into your already existing systems. This means less re-writing, no double inheritance headaches and overall a much more usable system.
+The whole ServiceManager has been reworked to specifically make use of the new IServiceBehaviour interface as well so you can keep using the already existing and expanding tools with little work! 
