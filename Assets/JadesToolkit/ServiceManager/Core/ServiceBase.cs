@@ -1,12 +1,14 @@
-﻿using UnityEngine;
+﻿using JadesToolkit.Services.Interfaces;
+using UnityEngine;
 namespace JadesToolkit.Services
 {
-    public abstract class ServiceBase : MonoBehaviour
+    public abstract class ServiceBase : MonoBehaviour, IServiceBehaviour
     {
         /// <summary>
         /// Abstract method used for initialization of service.
         /// </summary>
         public abstract void Initialize();
+
         /// <summary>
         /// Attempts to fetch an initialized instance of the specified service.
         /// </summary>

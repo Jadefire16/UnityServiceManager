@@ -1,4 +1,5 @@
 ﻿using JadesToolkit.Services.Attributes;
+using JadesToolkit.Services.Interfaces;
 using UnityEngine;
 using System;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace JadesToolkit.Services
 {
     public static class ServiceManager
     {
-        private static readonly Dictionary<Type, ServiceBase> services = new Dictionary<Type, ServiceBase>();
+        private static readonly Dictionary<Type, IServiceBehaviour> services = new Dictionary<Type, IServiceBehaviour>();
 
         private static GameObject coreObject;
 
@@ -18,15 +19,15 @@ namespace JadesToolkit.Services
         {
             services.Clear();
             coreObject = new GameObject("Service Manager");
-            Assembly assembly = Assembly.GetAssembly(typeof(ServiceBase)); 
+            Assembly assembly = Assembly.GetAssembly(typeof(IServiceBehaviour));
 
-            var allServiceTypes = assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(ServiceBase)) && t.IsAbstract == false).ToArray(); // fetch all MonoSingleton types and store in an array
+            var allServiceTypes = assembly.GetTypes().Where(t => typeof(IServiceBehaviour).IsAssignableFrom(t) && t.IsClass && t.IsSubclassOf(typeof(MonoBehaviour)) && !t.IsAbstract).ToArray(); // fetch all MonoSingleton types and store in an array
 
             foreach (var service in allServiceTypes)
             {
                 if (service.IsDefined(typeof(DoNotInitializeOnLoadAttribute), false))
                     continue;
-                var component = coreObject.AddComponent(service) as ServiceBase;
+                var component = coreObject.AddComponent(service) as IServiceBehaviour;
                 component.Initialize();
                 services.Add(service, component);
             }
@@ -39,10 +40,10 @@ namespace JadesToolkit.Services
         /// <typeparam name="T">The type of service</typeparam>
         /// <param name="value">The service</param>
         /// <returns>True if a service was found, otherwise false.</returns>
-        public static bool TryGetService<T>(out T value) where T : ServiceBase
+        public static bool TryGetService<T>(out T value) where T : MonoBehaviour, IServiceBehaviour
         {
-            value = null;
-            bool success = services.TryGetValue(typeof(T), out ServiceBase val);
+            value = default;
+            bool success = services.TryGetValue(typeof(T), out IServiceBehaviour val);
             if (!success)
                 return false;
             value = val as T;
@@ -53,16 +54,16 @@ namespace JadesToolkit.Services
         /// This will attempt to immediately fetch a loaded singleton of type T.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns name="T"><typeparamref name="T"/> where <typeparamref name="T"/> is type of <typeparamref name="ServiceBase"/>.</returns>
-        public static T GetService<T>() where T : ServiceBase => services[typeof(T)] as T;
+        /// <returns name="T"><typeparamref name="T"/> where <typeparamref name="T"/> is type of <typeparamref name="IServiceBehaviour"/>.</returns>
+        public static T GetService<T>() where T : MonoBehaviour, IServiceBehaviour => services[typeof(T)] as T;
 
         /// <summary>
         /// This will immediately fetch a loaded singleton of type T.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <remarks>If a service is not already active of type T one will be started</remarks>
-        /// <returns name="T"><typeparamref name="T"/> where <typeparamref name="T"/> is type of <typeparamref name="ServiceBase"/>.</returns>
-        public static T GetRequiredService<T>() where T : ServiceBase
+        /// <returns name="T"><typeparamref name="T"/> where <typeparamref name="T"/> is type of <typeparamref name="IServiceBehaviour"/>.</returns>
+        public static T GetRequiredService<T>() where T : MonoBehaviour, IServiceBehaviour
         {
             if (TryGetService<T>(out T value))
                 return value;
@@ -75,12 +76,12 @@ namespace JadesToolkit.Services
         /// </summary>
         /// <typeparam name="T">Type of Service</typeparam>
         /// <returns>True if service was ended, otherwise false.</returns>
-        public static bool TryEndService<T>() where T : ServiceBase
+        public static bool TryEndService<T>() where T : MonoBehaviour, IServiceBehaviour
         {
             if (!TryGetService<T>(out T value))
                 return false;
             services.Remove(typeof(T));
-            GameObject.Destroy(value);
+            UnityEngine.Object.Destroy(value);
             return true;
         }
 
@@ -88,18 +89,18 @@ namespace JadesToolkit.Services
         /// Attempts to end the service of type T and destroys the object
         /// </summary>
         /// <typeparam name="T">Type of Service</typeparam>
-        public static void EndService<T>() where T : ServiceBase
+        public static void EndService<T>() where T : MonoBehaviour, IServiceBehaviour
         {
-            var service = services[typeof(T)];
+            var service = services[typeof(T)] as T;
             services.Remove(typeof(T));
-            GameObject.Destroy(service);
+            UnityEngine.Object.Destroy(service);
         }
 
         /// <summary>
         /// Removes the service from the service managers control.
         /// </summary>
         /// <typeparam name="T">Type of Service</typeparam>
-        public static void TryRemoveService<T>() where T : ServiceBase
+        public static void TryRemoveService<T>() where T : MonoBehaviour, IServiceBehaviour
         {
             if (!services.ContainsKey(typeof(T)))
                 return;
@@ -122,11 +123,11 @@ namespace JadesToolkit.Services
         /// </summary>
         /// <typeparam name="T">The type of the service</typeparam>
         /// <returns>Returns true is service was successfully started, false otherwise.</returns>
-        public static bool StartService<T>() where T : ServiceBase
+        public static bool StartService<T>() where T : MonoBehaviour, IServiceBehaviour
         {
             if (services.ContainsKey(typeof(T)))
                 return false;
-            var component = coreObject.AddComponent(typeof(T)) as ServiceBase;
+            var component = coreObject.AddComponent(typeof(T)) as IServiceBehaviour;
             component.Initialize();
             services.Add(typeof(T), component);
             return true;
@@ -136,14 +137,14 @@ namespace JadesToolkit.Services
         /// Starts a new service of type T
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns>T where T is ServiceBase</returns>
+        /// <returns>T where T is IServiceBehaviour</returns>
         /// <remarks>Note: This will forcibly terminate an active instance of this type and create a new one</remarks>
-        public static T ForceStartService<T>() where T : ServiceBase
+        public static T ForceStartService<T>() where T : MonoBehaviour, IServiceBehaviour
         {
             if(services.ContainsKey(typeof(T)))
                 EndService<T>();              
 
-            var component = coreObject.AddComponent(typeof(T)) as ServiceBase;
+            var component = coreObject.AddComponent(typeof(T)) as IServiceBehaviour;
             component.Initialize();
             services.Add(typeof(T), component);
             return component as T;
@@ -153,9 +154,9 @@ namespace JadesToolkit.Services
         /// Integrates an external service into the service manager.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <returns>T where T is ServiceBase</returns>
+        /// <returns>T where T is IServiceBehaviour</returns>
         /// <remarks>This is useful for services marked with <typeparamref name="DoNotInitializeOnLoad"/></remarks>
-        public static bool TryAddExternalService<T>(ServiceBase<T> service, bool initialize = false) where T : ServiceBase
+        public static bool TryAddExternalService<T>(IServiceBehaviour service, bool initialize = false) where T : MonoBehaviour, IServiceBehaviour
         {
             if (services.ContainsKey(typeof(T)))
                 return false;

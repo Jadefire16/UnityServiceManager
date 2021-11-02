@@ -1,15 +1,16 @@
-﻿using JadesToolkit.Services;
-using System.Collections;
-using System.Collections.Generic;
+﻿using JadesToolkit.Services.Interfaces;
 using UnityEngine;
 
-public class Test : MonoBehaviour
+public class Test : IServiceBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public void Initialize()
     {
-        Debug.Log(ServiceManager.GetService<Singleton>());
+        Debug.Log("Initialized");
     }
 
-   
+    public bool TryGetService(out object obj)
+    {
+        obj = null;
+        return true;
+    }
 }
