@@ -48,6 +48,7 @@ namespace JadesToolkit.Services
             obj = instance;
             return obj == null;
         }
+
         protected virtual void OnDestroy()
         {
             ServiceManager.TryRemoveService(this.GetType());

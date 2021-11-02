@@ -91,6 +91,8 @@ namespace JadesToolkit.Services
         /// <typeparam name="T">Type of Service</typeparam>
         public static void EndService<T>() where T : MonoBehaviour, IServiceBehaviour
         {
+            if (!services.ContainsKey(typeof(T)))
+                return;
             var service = services[typeof(T)] as T;
             services.Remove(typeof(T));
             UnityEngine.Object.Destroy(service);
